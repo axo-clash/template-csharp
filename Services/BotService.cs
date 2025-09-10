@@ -4,7 +4,7 @@ namespace template_csharp.Services;
 
 public class BotService : IBotService
 {
-    public BotInfoDTO GetBotInfoAsync()
+    public BotInfoDTO GetBotInfo()
     {
         return new BotInfoDTO
         {
@@ -13,7 +13,7 @@ public class BotService : IBotService
         };
     }
 
-    public PlayResponseDTO PlayAsync(GameBotDTO gameBotDto)
+    public PlayResponseDTO Play(GameBotDTO gameBotDto)
     {
         // Return random action from all ActionType enum values
         var random = new Random();

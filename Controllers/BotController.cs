@@ -9,17 +9,19 @@ namespace template_csharp.Controllers;
 public class BotController : ControllerBase
 {
     private readonly IBotService _botService;
+    private readonly ILogger<BotController> _logger;
 
-    public BotController(IBotService botService)
+    public BotController(IBotService botService, ILogger<BotController> logger)
     {
         _botService = botService;
+        _logger = logger;
     }
 
     [HttpGet("info")]
     [ProducesResponseType(typeof(BotInfoDTO), StatusCodes.Status200OK)]
     public ActionResult<BotInfoDTO> GetBotInfo()
     {
-        var botInfo = _botService.GetBotInfoAsync();
+        var botInfo = _botService.GetBotInfo();
         return Ok(botInfo);
     }
 
@@ -27,7 +29,7 @@ public class BotController : ControllerBase
     [ProducesResponseType(typeof(PlayResponseDTO), StatusCodes.Status200OK)]
     public ActionResult<PlayResponseDTO> Play([FromBody] GameBotDTO gameBotDto)
     {
-        var response = _botService.PlayAsync(gameBotDto);
-        return Ok(response);
+        var playResponse = _botService.Play(gameBotDto);
+        return Ok(playResponse);
     }
 }
