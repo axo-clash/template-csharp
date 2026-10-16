@@ -5,7 +5,7 @@ This is a C# ASP.NET Core template for creating bots that compete in the Axo Cla
 ## Quick Start
 
 ### Prerequisites
-- .NET 9.0 SDK
+- .NET 10.0 SDK
 
 ### Running the Bot
 
@@ -14,27 +14,61 @@ This is a C# ASP.NET Core template for creating bots that compete in the Axo Cla
    dotnet run
    ```
    
-   The bot will start on `http://localhost:5144`
+   The bot will start on `http://localhost:9000`
+
+   The listen port can be overridden with the `PORT` environment variable:
+   ```bash
+   PORT=8080 dotnet run
+   ```
 
 2. **Verify it's working:**
-   - GET `http://localhost:5144/info` - Returns bot information
-   - POST `http://localhost:5144/play` - Accepts game state and returns bot action
+   - GET `http://localhost:9000/api/v1/bots/info` - Returns bot information
+   - POST `http://localhost:9000/api/v1/bots/play` - Accepts game state and returns bot action
+
+### Docker
+
+Build the image:
+```bash
+docker build -t axoclash-bot-csharp .
+```
+
+Run the container:
+```bash
+docker run -p 9000:9000 axoclash-bot-csharp
+```
+
+The container listens on port 9000 by default. Override it with the `PORT` environment variable (and map the port accordingly):
+```bash
+docker run -e PORT=8080 -p 8080:8080 axoclash-bot-csharp
+```
+
+The final image is built `FROM scratch`: the app is compiled with **NativeAOT** into a static ~16MB binary, and the image contains only that binary plus the musl loader (no OS, no runtime, no libraries).
+
+## NativeAOT and JSON serialization
+
+This template is compiled with **NativeAOT** (`PublishAot`), so reflection is not available at runtime. JSON serialization relies on the source-generated `BotJsonContext` declared at the bottom of `Program.cs`.
+
+If you add a new DTO or enum exchanged via the API, you must declare it in `BotJsonContext`:
+- one `[JsonSerializable(typeof(...))]` per root type;
+- one `JsonStringEnumConverter<T>` per new enum.
+
+Forgetting a registration raises an error at runtime on the affected endpoint.
 
 ## Implementing Your Bot Strategy
 
-To customize your bot's behavior, modify the `PlayAsync` method in **`Services/BotService.cs`**:
+To customize your bot's behavior, modify the `Play` method in **`Services/BotService.cs`**:
 
 ```csharp
-public PlayResponseDTO PlayAsync(GameBotDTO gameBotDto)
+public PlayResponseDTO Play(GameBotDTO gameBotDto)
 {
     // TODO: Implement your bot strategy here
     // Access game state: gameBotDto.Game
     // Access your bot data: gameBotDto.Bot
-    
+
     // Current implementation: random action
     var random = new Random();
-    var actions = Enum.GetValues(typeof(ActionType)).Cast<ActionType>();
-    var randomAction = actions.ElementAt(random.Next(actions.Count()));
+    var actions = Enum.GetValues<ActionType>();
+    var randomAction = actions[random.Next(actions.Length)];
 
     return new PlayResponseDTO
     {
@@ -57,13 +91,14 @@ public PlayResponseDTO PlayAsync(GameBotDTO gameBotDto)
 ## Project Structure
 
 ```
-├── Controllers/
-│   └── BotController.cs     # REST API endpoints
 ├── Services/
 │   ├── IBotService.cs       # Service interface
-│   └── BotService.cs        # 🎯 MODIFY THIS FILE
+│   └── BotService.cs        # MODIFY THIS FILE
 ├── Models/                  # Data transfer objects
-├── Program.cs              # Application entry point
+├── Converters/              # Custom JSON converters
+├── Program.cs              # Minimal API endpoints + JSON context
+├── Dockerfile               # Docker image build (NativeAOT, scratch)
+├── .dockerignore            # Files excluded from the Docker build context
 └── Properties/
     └── launchSettings.json # Development configuration
 ```
@@ -76,7 +111,7 @@ public PlayResponseDTO PlayAsync(GameBotDTO gameBotDto)
 
 ## Bot Information
 
-Update your bot's name and version in `BotService.GetBotInfoAsync()`:
+Update your bot's name and version in `BotService.GetBotInfo()`:
 
 ```csharp
 return new BotInfoDTO

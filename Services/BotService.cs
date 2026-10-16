@@ -17,8 +17,8 @@ public class BotService : IBotService
     {
         // Return random action from all ActionType enum values
         var random = new Random();
-        var actions = Enum.GetValues(typeof(ActionType)).Cast<ActionType>();
-        var randomAction = actions.ElementAt(random.Next(actions.Count()));
+        var actions = Enum.GetValues<ActionType>();
+        var randomAction = actions[random.Next(actions.Length)];
 
         return new PlayResponseDTO
         {
