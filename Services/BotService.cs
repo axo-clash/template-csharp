@@ -15,9 +15,11 @@ public class BotService : IBotService
 
     public PlayResponseDTO Play(GameBotDTO gameBotDto)
     {
-        // Return random action from all ActionType enum values
+        // PLACE_TRAP needs a target and cooldown handling; this starter only moves and shoots.
         var random = new Random();
-        var actions = Enum.GetValues<ActionType>();
+        var actions = Enum.GetValues<ActionType>()
+            .Where(action => action != ActionType.PLACE_TRAP && action != ActionType.UNKNOWN)
+            .ToArray();
         var randomAction = actions[random.Next(actions.Length)];
 
         return new PlayResponseDTO

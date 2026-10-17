@@ -120,3 +120,21 @@ return new BotInfoDTO
     Version = "1.0.0"
 };
 ```
+
+
+## Pièges et zone rouge
+
+Les modèles acceptent `PLACE_TRAP` avec `coordinates` et exposent `board[y][x].trap`
+(`placedBy`, `placedAtTurn`, `armedFromTurn`, `expiresAfterTurn`) et
+`bot.data.nextTrapTurn` (10 initialement). La stratégie fournie reste un exemple :
+elle n’exploite pas automatiquement les pièges.
+
+Une pose remplace le piège présent sur la case. Posé au tour T, il est actif de
+T+1 à T+10 inclus ; la recharge autorise une nouvelle pose à T+10. Après chaque
+action, les pièges sous les deux bots infligent 1 PV puis disparaissent, y compris
+sous leur créateur. Jouer deuxième peut donc empêcher de s’en échapper à temps.
+La couleur du créateur est purement visuelle. Les pièges ne bloquent pas les tirs.
+`currentTurn` compte les tours terminés : la prochaine action résout `currentTurn+1`.
+
+La zone rouge est annoncée aux tours 70/80/90/100 et active aux tours 75/85/95/105,
+du bord vers le centre : 1 PV par bot en zone active en fin de tour global.

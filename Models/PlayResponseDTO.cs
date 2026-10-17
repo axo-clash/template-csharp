@@ -2,6 +2,7 @@ namespace template_csharp.Models;
 
 public class PlayResponseDTO
 {
+    public CoordDTO? Coordinates { get; set; }
     public ActionType Action { get; set; }
 }
 
@@ -15,5 +16,6 @@ public enum ActionType
     SHOOT_RIGHT,
     SHOOT_UP,
     SHOOT_DOWN,
+    PLACE_TRAP,
     UNKNOWN
 }

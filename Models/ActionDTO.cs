@@ -5,6 +5,7 @@ namespace template_csharp.Models;
 
 public class ActionDTO
 {
+    public CoordDTO? Coordinates { get; set; }
     public long Id { get; set; }
     public long BotId { get; set; }
     public ActionType Action { get; set; }

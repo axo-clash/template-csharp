@@ -2,6 +2,7 @@ namespace template_csharp.Models;
 
 public class CaseDTO
 {
+    public TrapDTO? Trap { get; set; }
     public CoordDTO? Coordinates { get; set; }
     public CaseContent? Content { get; set; }
     public List<ItemDTO>? Items { get; set; } = new();

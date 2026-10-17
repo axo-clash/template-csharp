@@ -2,6 +2,7 @@ namespace template_csharp.Models;
 
 public class BotDataDTO
 {
+    public int? NextTrapTurn { get; set; }
     public int Life { get; set; }
     public int ForbiddenActions { get; set; }
     public BotState State { get; set; }
